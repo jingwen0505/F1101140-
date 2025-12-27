@@ -5,28 +5,24 @@ WIDTH = 400
 HEIGHT = 400
 GRID = 20
 
-SNAKE_COLOR = "green"
-FOOD_COLOR = "red"
-BG_COLOR = "black"
+SNAKE_COLOR = "#39ff14"   # 螢光綠
+FOOD_COLOR = "#ff3b3b"    # 紅
+BG_COLOR = "black"        # 復古黑底
 
 
 class SnakeGame:
     def __init__(self, root):
         self.root = root
-        self.root.title("貪食蛇 (Tkinter)")
+        self.root.title("復古貪食蛇")
 
         self.canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg=BG_COLOR)
         self.canvas.pack()
 
-        self.restart_button = None   # 先預留按鈕
+        self.restart_button = None
 
         self.start_game()
-
         self.root.bind("<KeyPress>", self.change_direction)
 
-    # -----------------
-    # 初始化 / 重新開始
-    # -----------------
     def start_game(self):
         self.snake = [(100, 100), (80, 100), (60, 100)]
         self.direction = "Right"
@@ -34,7 +30,6 @@ class SnakeGame:
         self.game_running = True
         self.canvas.delete("all")
 
-        # 如果有舊的按鈕就移除
         if self.restart_button:
             self.restart_button.destroy()
             self.restart_button = None
@@ -48,25 +43,38 @@ class SnakeGame:
             if (x, y) not in self.snake:
                 return (x, y)
 
+    def draw_grid(self):
+        # 畫復古格線
+        for x in range(0, WIDTH, GRID):
+            self.canvas.create_line(x, 0, x, HEIGHT, fill="#0a4f24")
+        for y in range(0, HEIGHT, GRID):
+            self.canvas.create_line(0, y, WIDTH, y, fill="#0a4f24")
+
     def draw(self):
         self.canvas.delete("all")
 
+        # 背景格線
+        self.draw_grid()
+
+        # 畫蛇
         for x, y in self.snake:
             self.canvas.create_rectangle(
                 x, y, x + GRID, y + GRID,
-                fill=SNAKE_COLOR
+                fill=SNAKE_COLOR,
+                outline="#003300"
             )
 
+        # 畫食物
         fx, fy = self.food
         self.canvas.create_oval(
             fx, fy, fx + GRID, fy + GRID,
-            fill=FOOD_COLOR
+            fill=FOOD_COLOR,
+            outline="#660000"
         )
 
     def change_direction(self, event):
         key = event.keysym
         opposites = {"Up": "Down", "Down": "Up", "Left": "Right", "Right": "Left"}
-
         if key in opposites and opposites[key] != self.direction:
             self.direction = key
 
@@ -107,21 +115,17 @@ class SnakeGame:
             self.draw()
             self.root.after(120, self.update)
 
-    # -----------------
-    # Game Over + 重新開始按鈕
-    # -----------------
     def game_over(self):
         self.game_running = False
 
         self.canvas.create_text(
             WIDTH // 2,
             HEIGHT // 2 - 20,
-            text="Game Over",
-            fill="white",
-            font=("Helvetica", 24)
+            text="GAME OVER",
+            fill="#39ff14",
+            font=("Courier", 22, "bold")
         )
 
-        # 建立重新開始按鈕
         self.restart_button = tk.Button(
             self.root,
             text="重新開始",
